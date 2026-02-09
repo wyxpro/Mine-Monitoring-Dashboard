@@ -1,0 +1,5 @@
+{
+  "name": "Mine Monitoring Dashboard",
+  "description": "A high-fidelity industrial dashboard replica for a mine monitoring and early warning system, featuring real-time data visualizations, schematic tunnel layouts, and responsive charts.",
+  "requestFramePermissions": []
+}
