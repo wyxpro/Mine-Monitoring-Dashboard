@@ -268,6 +268,7 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate, currentTime }) => {
 
       el.onclick = () => { 
         if(m.id === 'warning') onNavigateRef.current('dashboard');
+        else if(m.id === 'drainage') onNavigateRef.current('water-disaster');
         else if(m.id === 'hazard') onNavigateRef.current('drainage');
       };
       el.onmouseenter = () => { hoveredNodeRef.current = m.id; setHoveredId(m.id); controls.autoRotate = false; };

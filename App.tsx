@@ -6,6 +6,7 @@ import MineSchematic from './components/MineSchematic';
 import StatsOverview from './components/StatsOverview';
 import HomeView from './components/HomeView';
 import DrainageDashboard from './components/DrainageDashboard';
+import WaterDisasterDashboard from './components/WaterDisasterDashboard';
 import { 
   Layers,
   Wrench,
@@ -154,7 +155,7 @@ const TechGauge: React.FC<{ value: string; label: string }> = ({ value, label })
 };
 
 const App: React.FC = () => {
-  const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'drainage'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'drainage' | 'water-disaster'>('home');
   const [time, setTime] = useState(new Date());
   const [pressureData, setPressureData] = useState(initialPressureData);
   const [pipeFlowData, setPipeFlowData] = useState(initialPipeFlowData);
@@ -174,6 +175,10 @@ const App: React.FC = () => {
 
   if (currentView === 'drainage') {
     return <DrainageDashboard onBack={() => setCurrentView('home')} currentTime={time} />;
+  }
+
+  if (currentView === 'water-disaster') {
+    return <WaterDisasterDashboard onBack={() => setCurrentView('home')} currentTime={time} />;
   }
 
   return (
