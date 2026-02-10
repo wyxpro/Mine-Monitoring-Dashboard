@@ -1,14 +1,15 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import Header from './components/Header';
+import SidebarPanel from './components/SidebarPanel';
+import MineSchematic from './components/MineSchematic';
+import StatsOverview from './components/StatsOverview';
+import HomeView from './components/HomeView';
+import DrainageDashboard from './components/DrainageDashboard';
 import { 
-  Activity, 
-  Droplets, 
-  Thermometer, 
-  ArrowRightLeft,
   Layers,
   Wrench,
-  Settings,
-  Maximize2
+  Settings
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -22,11 +23,8 @@ import {
   Area,
   LabelList
 } from 'recharts';
-import Header from './components/Header';
-import SidebarPanel from './components/SidebarPanel';
-import MineSchematic from './components/MineSchematic';
-import StatsOverview from './components/StatsOverview';
 
+// Existing data constants preserved
 const initialWaterLevelData = [
   { name: '四盘区泄水巷404密闭墙液位计', value: 0.825 },
   { name: '22103辅运密闭墙液位计', value: 0.410 },
@@ -76,16 +74,7 @@ const CustomXAxisLabel = ({ x, y, payload }: any) => {
   return (
     <g transform={`translate(${x},${y})`}>
       {words.map((word: string, index: number) => (
-        <text
-          key={index}
-          x={0}
-          y={12 * (index + 1)}
-          dy={0}
-          textAnchor="middle"
-          fill="#94a3b8"
-          fontSize={10}
-          className="font-medium"
-        >
+        <text key={index} x={0} y={12 * (index + 1)} dy={0} textAnchor="middle" fill="#94a3b8" fontSize={10} className="font-medium">
           {word}
         </text>
       ))}
@@ -108,13 +97,8 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-// Auto-scrolling Table Component
-const AutoScrollingTable: React.FC<{ data: { name: string; value: number }[]; unit?: string }> = ({ data, unit }) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  
-  // Duplicate data for seamless loop
+const AutoScrollingTable: React.FC<{ data: { name: string; value: number }[]; unit?: string }> = ({ data }) => {
   const displayData = [...data, ...data];
-
   return (
     <div className="w-full mt-2 overflow-hidden h-[300px] relative">
       <table className="w-full text-left border-collapse sticky top-0 z-10 bg-[#030816]">
@@ -126,264 +110,132 @@ const AutoScrollingTable: React.FC<{ data: { name: string; value: number }[]; un
         </thead>
       </table>
       <div className="overflow-hidden h-[240px]">
-        <div 
-          className="animate-scroll-down"
-          style={{ 
-            animation: `scrollDown ${data.length * 3}s linear infinite`,
-          }}
-        >
+        <div className="animate-scroll-down" style={{ animation: `scrollDown ${data.length * 3}s linear infinite` }}>
           <table className="w-full text-left border-collapse">
             <tbody className="text-[15px]">
               {displayData.map((row, i) => (
                 <tr key={i} className={`border-b border-white/5 transition-colors ${i % 2 === 1 ? 'bg-transparent' : 'bg-white/[0.01]'}`}>
                   <td className="py-5 px-4 text-slate-300 font-medium whitespace-pre-wrap">{row.name}</td>
-                  <td className="py-5 px-4 text-right text-cyan-400 font-mono font-bold text-lg">
-                    {row.value.toFixed(3)}
-                  </td>
+                  <td className="py-5 px-4 text-right text-cyan-400 font-mono font-bold text-lg">{row.value.toFixed(3)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
-      <style>{`
-        @keyframes scrollDown {
-          0% { transform: translateY(-50%); }
-          100% { transform: translateY(0%); }
-        }
-      `}</style>
+      <style>{`@keyframes scrollDown { 0% { transform: translateY(-50%); } 100% { transform: translateY(0%); } }`}</style>
     </div>
   );
 };
 
-// Tech-styled Gauge Component for Water Quality
 const TechGauge: React.FC<{ value: string; label: string }> = ({ value, label }) => {
   return (
     <div className="flex flex-col items-center w-full px-1 group">
       <div className="relative w-20 h-20 md:w-24 md:h-24 flex items-center justify-center mb-3">
-        {/* Outer Segmented Ring */}
         <div className="absolute inset-0 opacity-40 group-hover:opacity-70 transition-opacity">
           {Array.from({ length: 12 }).map((_, i) => (
-            <div 
-              key={i}
-              className="absolute w-[2px] h-[6px] bg-cyan-400 left-1/2 top-0 origin-bottom -translate-x-1/2"
-              style={{ transform: `translateX(-50%) rotate(${i * 30}deg)`, top: '2px', borderRadius: '1px' }}
-            ></div>
+            <div key={i} className="absolute w-[2px] h-[6px] bg-cyan-400 left-1/2 top-0 origin-bottom -translate-x-1/2" style={{ transform: `translateX(-50%) rotate(${i * 30}deg)`, top: '2px', borderRadius: '1px' }}></div>
           ))}
         </div>
-        
-        {/* Inner Segmented Ring */}
         <div className="absolute inset-2 border border-cyan-500/20 rounded-full"></div>
         <div className="absolute inset-4 border-2 border-dashed border-cyan-500/30 rounded-full animate-[spin_20s_linear_infinite]"></div>
-        
-        {/* Center Glow and Value */}
         <div className="z-10 flex items-center justify-center">
-          <span className="text-[14px] md:text-[15px] font-bold text-white tracking-tighter drop-shadow-[0_0_5px_rgba(34,211,238,0.8)] font-mono">
-            {value}
-          </span>
+          <span className="text-[14px] md:text-[15px] font-bold text-white tracking-tighter drop-shadow-[0_0_5px_rgba(34,211,238,0.8)] font-mono">{value}</span>
         </div>
-        
-        {/* Decoration Arc */}
         <div className="absolute inset-[6px] border-t-2 border-cyan-400 rounded-full opacity-60"></div>
-        
-        {/* Top Detail Pin */}
         <div className="absolute top-[-6px] left-1/2 -translate-x-1/2 w-4 h-4 flex items-center justify-center">
             <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full shadow-[0_0_8px_cyan]"></div>
             <div className="absolute w-3 h-3 border border-cyan-400/50 rounded-full"></div>
         </div>
       </div>
-      
-      {/* Label with improved wrapping and adequate spacing */}
-      <div className="text-[11px] leading-[1.4] text-slate-300 text-center font-medium w-full min-h-[52px] px-1">
-        {label}
-      </div>
+      <div className="text-[11px] leading-[1.4] text-slate-300 text-center font-medium w-full min-h-[52px] px-1">{label}</div>
     </div>
   );
 };
 
 const App: React.FC = () => {
+  const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'drainage'>('home');
   const [time, setTime] = useState(new Date());
   const [pressureData, setPressureData] = useState(initialPressureData);
   const [pipeFlowData, setPipeFlowData] = useState(initialPipeFlowData);
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
-    
-    // Simulate real-time data fluctuations
     const dataTimer = setInterval(() => {
-      setPressureData(prev => prev.map(item => ({
-        ...item,
-        value: item.value > 0 
-          ? Number((item.value + (Math.random() - 0.5) * 0.01).toFixed(3))
-          : 0
-      })));
-
-      setPipeFlowData(prev => prev.map(item => ({
-        ...item,
-        value: item.value > 0 
-          ? Number((item.value + (Math.random() - 0.5) * 2).toFixed(3))
-          : 0
-      })));
+      setPressureData(prev => prev.map(item => ({ ...item, value: item.value > 0 ? Number((item.value + (Math.random() - 0.5) * 0.01).toFixed(3)) : 0 })));
+      setPipeFlowData(prev => prev.map(item => ({ ...item, value: item.value > 0 ? Number((item.value + (Math.random() - 0.5) * 2).toFixed(3)) : 0 })));
     }, 3000);
-
-    return () => {
-      clearInterval(timer);
-      clearInterval(dataTimer);
-    };
+    return () => { clearInterval(timer); clearInterval(dataTimer); };
   }, []);
+
+  if (currentView === 'home') {
+    return <HomeView onNavigate={(view) => setCurrentView(view as any)} currentTime={time} />;
+  }
+
+  if (currentView === 'drainage') {
+    return <DrainageDashboard onBack={() => setCurrentView('home')} currentTime={time} />;
+  }
 
   return (
     <div className="h-screen w-screen bg-[#030816] text-slate-200 flex flex-col overflow-hidden select-none">
-      <Header currentTime={time} />
-      
+      <Header currentTime={time} onHomeClick={() => setCurrentView('home')} />
       <main className="flex-1 flex p-4 gap-4 overflow-hidden relative">
-        {/* Background Grid Pattern */}
-        <div className="absolute inset-0 opacity-5 pointer-events-none" 
-             style={{ backgroundImage: 'radial-gradient(#00f2ff 0.5px, transparent 0.5px)', backgroundSize: '40px 40px' }} />
-
-        {/* Left Panels */}
+        <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#00f2ff 0.5px, transparent 0.5px)', backgroundSize: '40px 40px' }} />
         <div className="w-[440px] flex flex-col z-10 overflow-y-auto pr-2">
-          
-          {/* 水位数据 Panel */}
           <SidebarPanel title="水位数据" unit="mm">
             <div className="h-[300px] w-full mt-[-10px]"> 
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart 
-                  data={initialWaterLevelData} 
-                  margin={{ top: 25, right: 10, left: -20, bottom: 85 }}
-                >
+                <BarChart data={initialWaterLevelData} margin={{ top: 25, right: 10, left: -20, bottom: 85 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                  <XAxis 
-                    dataKey="name" 
-                    interval={0} 
-                    tick={<CustomXAxisLabel />} 
-                    axisLine={{ stroke: 'rgba(255,255,255,0.2)' }}
-                    tickLine={false}
-                  />
-                  <YAxis 
-                    domain={[0, 1]} 
-                    ticks={[0, 0.2, 0.4, 0.6, 0.8, 1]}
-                    stroke="rgba(255,255,255,0.4)" 
-                    fontSize={11}
-                    axisLine={{ stroke: 'rgba(255,255,255,0.2)' }}
-                    tickLine={false}
-                  />
-                  <Tooltip 
-                    content={<CustomTooltip />}
-                    cursor={{ fill: 'rgba(6,182,212,0.05)' }}
-                  />
-                  <Bar 
-                    dataKey="value" 
-                    fill="url(#barGradient)" 
-                    radius={[0, 0, 0, 0]} 
-                    barSize={32}
-                    isAnimationActive={false}
-                  >
-                    <LabelList 
-                      dataKey="value" 
-                      position="top" 
-                      fill="#ffffff" 
-                      fontSize={14} 
-                      fontWeight="bold" 
-                      offset={10} 
-                    />
+                  <XAxis dataKey="name" interval={0} tick={<CustomXAxisLabel />} axisLine={{ stroke: 'rgba(255,255,255,0.2)' }} tickLine={false} />
+                  <YAxis domain={[0, 1]} ticks={[0, 0.2, 0.4, 0.6, 0.8, 1]} stroke="rgba(255,255,255,0.4)" fontSize={11} axisLine={{ stroke: 'rgba(255,255,255,0.2)' }} tickLine={false} />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(6,182,212,0.05)' }} />
+                  <Bar dataKey="value" fill="url(#barGradient)" radius={[0, 0, 0, 0]} barSize={32} isAnimationActive={false}>
+                    <LabelList dataKey="value" position="top" fill="#ffffff" fontSize={14} fontWeight="bold" offset={10} />
                   </Bar>
-                  <defs>
-                    <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#00f2ff" stopOpacity={1} />
-                      <stop offset="100%" stopColor="#06b6d4" stopOpacity={0.4} />
-                    </linearGradient>
-                  </defs>
+                  <defs><linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#00f2ff" stopOpacity={1} /><stop offset="100%" stopColor="#06b6d4" stopOpacity={0.4} /></linearGradient></defs>
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </SidebarPanel>
-
-          {/* 流量数据 Panel */}
           <SidebarPanel title="流量数据" unit="m³/h">
             <div className="h-[240px] w-full mt-2">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={initialFlowData} margin={{ top: 30, right: 30, left: -10, bottom: 60 }}>
-                  <defs>
-                    <linearGradient id="colorFlow" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#00f2ff" stopOpacity={0.6}/>
-                      <stop offset="95%" stopColor="#00f2ff" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
+                  <defs><linearGradient id="colorFlow" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#00f2ff" stopOpacity={0.6}/><stop offset="95%" stopColor="#00f2ff" stopOpacity={0}/></linearGradient></defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.1)" />
-                  <XAxis 
-                    dataKey="name" 
-                    interval={0} 
-                    tick={<CustomXAxisLabel />}
-                    axisLine={{ stroke: 'rgba(255,255,255,0.2)' }}
-                    tickLine={false}
-                  />
-                  <YAxis 
-                    stroke="rgba(255,255,255,0.4)" 
-                    fontSize={11} 
-                    ticks={[0, 200, 400, 600, 800, 1000, 1200]}
-                    axisLine={{ stroke: 'rgba(255,255,255,0.2)' }}
-                    tickLine={false}
-                  />
+                  <XAxis dataKey="name" interval={0} tick={<CustomXAxisLabel />} axisLine={{ stroke: 'rgba(255,255,255,0.2)' }} tickLine={false} />
+                  <YAxis stroke="rgba(255,255,255,0.4)" fontSize={11} ticks={[0, 200, 400, 600, 800, 1000, 1200]} axisLine={{ stroke: 'rgba(255,255,255,0.2)' }} tickLine={false} />
                   <Tooltip contentStyle={{ backgroundColor: 'rgba(10, 25, 47, 0.95)', border: '1px solid #00f2ff' }} />
-                  <Area 
-                    type="monotone" 
-                    dataKey="value" 
-                    stroke="#00f2ff" 
-                    strokeWidth={3} 
-                    fillOpacity={1} 
-                    fill="url(#colorFlow)" 
-                    dot={{ r: 5, fill: '#00f2ff', stroke: '#fff', strokeWidth: 2 }}
-                    activeDot={{ r: 7, strokeWidth: 0 }}
-                  >
+                  <Area type="monotone" dataKey="value" stroke="#00f2ff" strokeWidth={3} fillOpacity={1} fill="url(#colorFlow)" dot={{ r: 5, fill: '#00f2ff', stroke: '#fff', strokeWidth: 2 }} activeDot={{ r: 7, strokeWidth: 0 }}>
                     <LabelList dataKey="value" position="top" fill="#fff" fontSize={11} fontWeight="bold" offset={10} />
                   </Area>
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </SidebarPanel>
-
-          {/* 水压数据 Panel - AUTO SCROLLING */}
           <SidebarPanel title="水压数据" unit="Mpa">
             <AutoScrollingTable data={pressureData} />
           </SidebarPanel>
         </div>
-
-        {/* Center Visualization */}
         <div className="flex-1 relative flex flex-col">
           <StatsOverview />
           <MineSchematic />
-          
           <div className="absolute bottom-6 right-6 flex flex-col gap-3 z-20">
-            <button className="w-11 h-11 flex items-center justify-center bg-slate-900/90 border border-cyan-500/50 rounded shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:bg-cyan-500/30 text-cyan-400 transition-all">
-               <Layers size={22} />
-            </button>
-            <button className="w-11 h-11 flex items-center justify-center bg-slate-900/90 border border-cyan-500/50 rounded shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:bg-cyan-500/30 text-cyan-400 transition-all">
-               <Settings size={22} />
-            </button>
-            <button className="w-11 h-11 flex items-center justify-center bg-slate-900/90 border border-cyan-500/50 rounded shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:bg-cyan-500/30 text-cyan-400 transition-all">
-               <Wrench size={22} />
-            </button>
+            <button className="w-11 h-11 flex items-center justify-center bg-slate-900/90 border border-cyan-500/50 rounded shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:bg-cyan-500/30 text-cyan-400 transition-all"><Layers size={22} /></button>
+            <button className="w-11 h-11 flex items-center justify-center bg-slate-900/90 border border-cyan-500/50 rounded shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:bg-cyan-500/30 text-cyan-400 transition-all"><Settings size={22} /></button>
+            <button className="w-11 h-11 flex items-center justify-center bg-slate-900/90 border border-cyan-500/50 rounded shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:bg-cyan-500/30 text-cyan-400 transition-all"><Wrench size={22} /></button>
           </div>
         </div>
-
-        {/* Right Panels */}
         <div className="w-[420px] flex flex-col z-10 overflow-y-auto pl-2">
-          {/* 管道流量数据 Panel - AUTO SCROLLING */}
           <SidebarPanel title="管道流量数据" unit="m³/h">
              <AutoScrollingTable data={pipeFlowData} />
           </SidebarPanel>
-
-          {/* 水质数据 Panel - ADJUSTED FOR BETTER VISIBILITY */}
           <SidebarPanel title="水质数据" unit="NTU">
             <div className="grid grid-cols-3 gap-y-8 gap-x-2 mt-4 px-1 pb-10">
-              {waterQualityData.map((item, i) => (
-                <TechGauge key={i} value={item.val} label={item.label} />
-              ))}
+              {waterQualityData.map((item, i) => <TechGauge key={i} value={item.val} label={item.label} />)}
             </div>
           </SidebarPanel>
-
-          {/* 温度数据 Panel */}
           <SidebarPanel title="温度数据" unit="℃">
             <div className="flex justify-around items-center py-6">
               <div className="flex flex-col items-center group">
@@ -404,7 +256,6 @@ const App: React.FC = () => {
           </SidebarPanel>
         </div>
       </main>
-
       <div className="bg-cyan-500/10 h-[1px] w-full"></div>
     </div>
   );
