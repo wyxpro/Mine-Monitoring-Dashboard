@@ -4,9 +4,21 @@ import { Home, Bell, Settings, Maximize2, ChevronDown, Snowflake, Siren } from '
 
 interface HeaderProps {
   currentTime: Date;
+  onHomeClick: () => void;
+  onAlarmClick: () => void;
+  onSettingsClick: () => void;
+  onFullscreenClick: () => void;
+  onUserClick: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ currentTime }) => {
+const Header: React.FC<HeaderProps> = ({ 
+  currentTime, 
+  onHomeClick, 
+  onAlarmClick, 
+  onSettingsClick, 
+  onFullscreenClick, 
+  onUserClick 
+}) => {
   const formatTime = (date: Date) => {
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
@@ -58,7 +70,7 @@ const Header: React.FC<HeaderProps> = ({ currentTime }) => {
             {/* Grid Pattern Overlay */}
             <div className="absolute inset-0 opacity-20 pointer-events-none" 
                  style={{ backgroundImage: 'linear-gradient(90deg, #00f2ff 1px, transparent 1px), linear-gradient(#00f2ff 1px, transparent 1px)', backgroundSize: '10px 10px' }}></div>
-            <span className="text-white font-bold tracking-widest text-sm relative z-10">井上监测</span>
+            <span className="text-white font-bold tracking-widest text-sm relative z-10">自研大数据</span>
           </div>
           {/* Accent Lines */}
           <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
@@ -80,7 +92,7 @@ const Header: React.FC<HeaderProps> = ({ currentTime }) => {
           <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-[70%] h-[2px] bg-white shadow-[0_0_15px_#fff,0_0_5px_cyan]"></div>
 
           <h1 className="text-4xl font-bold tracking-[0.25em] text-white z-10 drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
-            矿井安全监测预警系统
+            煤矿防治水监测预警系统
           </h1>
         </div>
 
@@ -95,7 +107,7 @@ const Header: React.FC<HeaderProps> = ({ currentTime }) => {
           >
             <div className="absolute inset-0 opacity-20 pointer-events-none" 
                  style={{ backgroundImage: 'linear-gradient(90deg, #00f2ff 1px, transparent 1px), linear-gradient(#00f2ff 1px, transparent 1px)', backgroundSize: '10px 10px' }}></div>
-            <span className="text-white font-bold tracking-widest text-sm relative z-10">井下监测</span>
+            <span className="text-white font-bold tracking-widest text-sm relative z-10">算法赋能</span>
           </div>
           {/* Accent Lines */}
           <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
@@ -108,21 +120,36 @@ const Header: React.FC<HeaderProps> = ({ currentTime }) => {
       {/* Right Section: Tools and User */}
       <div className="flex items-center gap-6 z-10 min-w-[300px] justify-end">
         <div className="flex items-center gap-5 text-slate-200">
-          <button className="hover:text-cyan-400 transition-colors drop-shadow-sm">
+          <button 
+            onClick={onHomeClick}
+            className="hover:text-cyan-400 transition-colors drop-shadow-sm p-1"
+          >
             <Home size={22} strokeWidth={1.5} />
           </button>
-          <button className="hover:text-cyan-400 transition-colors drop-shadow-sm">
+          <button 
+            onClick={onAlarmClick}
+            className="hover:text-cyan-400 transition-colors drop-shadow-sm p-1"
+          >
             <Siren size={22} strokeWidth={1.5} />
           </button>
-          <button className="hover:text-cyan-400 transition-colors drop-shadow-sm">
+          <button 
+            onClick={onSettingsClick}
+            className="hover:text-cyan-400 transition-colors drop-shadow-sm p-1"
+          >
             <Settings size={22} strokeWidth={1.5} />
           </button>
-          <button className="hover:text-cyan-400 transition-colors drop-shadow-sm">
+          <button 
+            onClick={onFullscreenClick}
+            className="hover:text-cyan-400 transition-colors drop-shadow-sm p-1"
+          >
             <Maximize2 size={22} strokeWidth={1.5} />
           </button>
           
           {/* User Profile */}
-          <div className="flex items-center gap-2 pl-4 cursor-pointer hover:opacity-80 transition-opacity">
+          <div 
+            onClick={onUserClick}
+            className="flex items-center gap-2 pl-4 cursor-pointer hover:opacity-80 transition-opacity"
+          >
             <span className="text-md font-medium text-cyan-500">admin</span>
             <ChevronDown size={14} className="text-slate-500" />
           </div>

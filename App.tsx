@@ -8,7 +8,9 @@ import {
   Layers,
   Wrench,
   Settings,
-  Maximize2
+  Maximize2,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -26,49 +28,57 @@ import Header from './components/Header';
 import SidebarPanel from './components/SidebarPanel';
 import MineSchematic from './components/MineSchematic';
 import StatsOverview from './components/StatsOverview';
+import SensorDetailModal from './components/SensorDetailModal';
+import LayersModal from './components/LayersModal';
+import SettingsModal from './components/SettingsModal';
+import ToolsModal from './components/ToolsModal';
+import AlarmHistoryModal from './components/AlarmHistoryModal';
+import UserProfileModal from './components/UserProfileModal';
+import HomeSummaryModal from './components/HomeSummaryModal';
 
 const initialWaterLevelData = [
-  { name: '四盘区泄水巷404密闭墙液位计', value: 0.825 },
-  { name: '22103辅运密闭墙液位计', value: 0.410 },
-  { name: '21201主运切眼密闭墙液位计', value: 0.293 },
-  { name: '四盘区泄水巷3600米密闭墙液位计', value: 0.195 },
-  { name: '22103切眼密闭路面液位计', value: 0.582 },
+  { name: '探放水孔装置1', value: 0.825 },
+  { name: '探放水孔装置2', value: 0.410 },
+  { name: '探放水孔装置3', value: 0.293 },
+  { name: '探放水孔装置4', value: 0.195 },
+  { name: '探放水孔装置5', value: 0.582 },
 ];
 
 const initialFlowData = [
-  { name: '四盘区水仓明渠流量', value: 18.6 },
-  { name: '一盘区水仓明渠流量', value: 207.000 },
-  { name: '中央水仓明渠流量', value: 1084.315 },
-  { name: '2号水仓明渠流量', value: 658.820 },
+  { name: '探放水孔装置1', value: 18.6 },
+  { name: '探放水孔装置2', value: 207.000 },
+  { name: '探放水孔装置3', value: 1084.315 },
+  { name: '探放水孔装置4', value: 658.820 },
+  { name: '探放水孔 装置5', value: 720.000 },
 ];
 
 const initialPressureData = [
-  { name: '4盘区主运巷末端水文监测...', value: 0.262 },
-  { name: '2111水文监测孔 (水压)', value: 0.294 },
-  { name: '中央风井底水文监测孔 1#...', value: 1.781 },
-  { name: '四盘区水仓水文监测孔 (...', value: 0.000 },
-  { name: '四盘区泄水巷水文监测孔...', value: 0.025 },
-  { name: '一盘区西翼监测孔 (水压)', value: 0.142 },
-  { name: '3号煤层回风巷监测点', value: 0.089 },
+  { name: '探放水孔装置1', value: 0.262 },
+  { name: '探放水孔装置2', value: 0.294 },
+  { name: '探放水孔装置3', value: 1.781 },
+  { name: '探放水孔装置4', value: 0.000 },
+  { name: '探放水孔装置5', value: 0.025 },
+  { name: '探放水孔装置6', value: 0.142 },
+  { name: '探放水孔装置7', value: 0.089 },
 ];
 
 const initialPipeFlowData = [
-  { name: '东翼斜巷管道流量B管', value: 0.000 },
-  { name: '403主运反倔管道流量计A管', value: 316.800 },
-  { name: '403主运反倔管道流量计B管', value: 0.000 },
-  { name: '西翼斜巷管道流量A管', value: 0.000 },
-  { name: '水仓管道流量A管', value: 0.000 },
-  { name: '南翼主运辅助管路流量', value: 124.500 },
-  { name: '二盘区回风巷排水流量', value: 45.210 },
+  { name: '探放水孔装置1', value: 0.000 },
+  { name: '探放水孔装置2', value: 316.800 },
+  { name: '探放水孔装置3', value: 0.000 },
+  { name: '探放水孔装置4', value: 0.000 },
+  { name: '探放水孔装置5', value: 0.000 },
+  { name: '探放水孔装置6', value: 124.500 },
+  { name: '探放水孔装置7', value: 45.210 },
 ];
 
 const waterQualityData = [
-  { label: '中央风井底水文监测孔1# (水压)', val: '1.781' },
-  { label: '四盘区水仓水文监测孔 (水压)', val: '0.000' },
-  { label: '四盘区泄水巷水文监测孔 (水压)', val: '0.025' },
-  { label: '一盘区水仓水文监测孔 (水压)', val: '0.036' },
-  { label: '4盘区泄水巷水文监测孔新 (水压)', val: '0.581' },
-  { label: '4盘区主运巷末端水文监测孔 (水压)', val: '0.262' },
+  { label: '探放水孔装置1', val: '1.781' },
+  { label: '探放水孔装置2 ', val: '0.000' },
+  { label: '探放水孔装置3 ', val: '0.025' },
+  { label: '探放水孔装置4 ', val: '0.036' },
+  { label: '探放水孔装置5 ', val: '0.581' },
+  { label: '探放水孔装置6 ', val: '0.262' },
 ];
 
 const CustomXAxisLabel = ({ x, y, payload }: any) => {
@@ -160,7 +170,7 @@ const AutoScrollingTable: React.FC<{ data: { name: string; value: number }[]; un
 const TechGauge: React.FC<{ value: string; label: string }> = ({ value, label }) => {
   return (
     <div className="flex flex-col items-center w-full px-1 group">
-      <div className="relative w-20 h-20 md:w-24 md:h-24 flex items-center justify-center mb-3">
+      <div className="relative w-18 h-18 md:w-20 md:h-20 flex items-center justify-center mb-2">
         {/* Outer Segmented Ring */}
         <div className="absolute inset-0 opacity-40 group-hover:opacity-70 transition-opacity">
           {Array.from({ length: 12 }).map((_, i) => (
@@ -178,7 +188,7 @@ const TechGauge: React.FC<{ value: string; label: string }> = ({ value, label })
         
         {/* Center Glow and Value */}
         <div className="z-10 flex items-center justify-center">
-          <span className="text-[14px] md:text-[15px] font-bold text-white tracking-tighter drop-shadow-[0_0_5px_rgba(34,211,238,0.8)] font-mono">
+          <span className="text-[13px] md:text-[14px] font-bold text-white tracking-tighter drop-shadow-[0_0_5px_rgba(34,211,238,0.8)] font-mono">
             {value}
           </span>
         </div>
@@ -194,7 +204,7 @@ const TechGauge: React.FC<{ value: string; label: string }> = ({ value, label })
       </div>
       
       {/* Label with improved wrapping and adequate spacing */}
-      <div className="text-[11px] leading-[1.4] text-slate-300 text-center font-medium w-full min-h-[52px] px-1">
+      <div className="text-[10px] leading-[1.4] text-slate-300 text-center font-medium w-full min-h-[40px] px-1">
         {label}
       </div>
     </div>
@@ -205,6 +215,17 @@ const App: React.FC = () => {
   const [time, setTime] = useState(new Date());
   const [pressureData, setPressureData] = useState(initialPressureData);
   const [pipeFlowData, setPipeFlowData] = useState(initialPipeFlowData);
+  const [showLabels, setShowLabels] = useState(true);
+  const [selectedSensor, setSelectedSensor] = useState<any>(null);
+  const [activePanel, setActivePanel] = useState<'layers' | 'settings' | 'tools' | 'alarm' | 'user' | 'home' | null>(null);
+  const [tempA, setTempA] = useState(26.6);
+  const [tempB, setTempB] = useState(22.8);
+  const [holeStats, setHoleStats] = useState({
+    total: 30,
+    online: 18,
+    offline: 8,
+    warning: 4,
+  });
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -224,6 +245,43 @@ const App: React.FC = () => {
           ? Number((item.value + (Math.random() - 0.5) * 2).toFixed(3))
           : 0
       })));
+      
+      setTempA(prev => {
+        const next = prev + (Math.random() - 0.5) * 0.3;
+        const clamped = Math.min(28.5, Math.max(25.5, next));
+        return Number(clamped.toFixed(1));
+      });
+      setTempB(prev => {
+        const next = prev + (Math.random() - 0.5) * 0.25;
+        const clamped = Math.min(24.5, Math.max(21.5, next));
+        return Number(clamped.toFixed(1));
+      });
+      
+      // 微变化更新探放水孔统计，保持总数不变
+      setHoleStats(prev => {
+        let { total, online, offline, warning } = prev;
+        // 随机选择一项微调
+        const r = Math.random();
+        if (r < 0.33) online = Math.max(0, Math.min(total, online + (Math.random() < 0.5 ? -1 : 1)));
+        else if (r < 0.66) offline = Math.max(0, Math.min(total, offline + (Math.random() < 0.5 ? -1 : 1)));
+        else warning = Math.max(0, Math.min(total, warning + (Math.random() < 0.5 ? -1 : 1)));
+        // 规范化，避免超过总数
+        const sum = online + offline + warning;
+        if (sum > total) {
+          // 优先减少最大项
+          const arr = [{k:'online',v:online},{k:'offline',v:offline},{k:'warning',v:warning}].sort((a,b)=>b.v-a.v);
+          let excess = sum - total;
+          for (const item of arr) {
+            const reduce = Math.min(item.v, excess);
+            if (item.k === 'online') online -= reduce;
+            if (item.k === 'offline') offline -= reduce;
+            if (item.k === 'warning') warning -= reduce;
+            excess -= reduce;
+            if (excess <= 0) break;
+          }
+        }
+        return { total, online, offline, warning };
+      });
     }, 3000);
 
     return () => {
@@ -232,9 +290,26 @@ const App: React.FC = () => {
     };
   }, []);
 
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
   return (
     <div className="h-screen w-screen bg-[#030816] text-slate-200 flex flex-col overflow-hidden select-none">
-      <Header currentTime={time} />
+      <Header 
+        currentTime={time} 
+        onHomeClick={() => setActivePanel('home')}
+        onAlarmClick={() => setActivePanel('alarm')}
+        onSettingsClick={() => setActivePanel('settings')}
+        onFullscreenClick={toggleFullscreen}
+        onUserClick={() => setActivePanel('user')}
+      />
       
       <main className="flex-1 flex p-4 gap-4 overflow-hidden relative">
         {/* Background Grid Pattern */}
@@ -244,6 +319,55 @@ const App: React.FC = () => {
         {/* Left Panels */}
         <div className="w-[440px] flex flex-col z-10 overflow-y-auto pr-2">
           
+          {/* 水压数据 Panel - AUTO SCROLLING */}
+          <SidebarPanel title="水压数据" unit="Mpa">
+            <AutoScrollingTable data={pressureData} />
+          </SidebarPanel>
+
+          {/* 流量数据 Panel */}
+          <SidebarPanel title="流量数据" unit="m³/h">
+            <div className="h-[240px] w-full mt-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={initialFlowData} margin={{ top: 30, right: 30, left: -10, bottom: 60 }}>
+                  <defs>
+                    <linearGradient id="colorFlow" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#00f2ff" stopOpacity={0.6}/>
+                      <stop offset="95%" stopColor="#00f2ff" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.1)" />
+                  <XAxis 
+                    dataKey="name" 
+                    interval={0} 
+                    tick={<CustomXAxisLabel />}
+                    axisLine={{ stroke: 'rgba(255,255,255,0.2)' }}
+                    tickLine={false}
+                  />
+                  <YAxis 
+                    stroke="rgba(255,255,255,0.4)" 
+                    fontSize={11} 
+                    ticks={[0, 200, 400, 600, 800, 1000, 1200]}
+                    axisLine={{ stroke: 'rgba(255,255,255,0.2)' }}
+                    tickLine={false}
+                  />
+                  <Tooltip contentStyle={{ backgroundColor: 'rgba(10, 25, 47, 0.95)', border: '1px solid #00f2ff' }} />
+                  <Area 
+                    type="monotone" 
+                    dataKey="value" 
+                    stroke="#00f2ff" 
+                    strokeWidth={3} 
+                    fillOpacity={1} 
+                    fill="url(#colorFlow)" 
+                    dot={{ r: 5, fill: '#00f2ff', stroke: '#fff', strokeWidth: 2 }}
+                    activeDot={{ r: 7, strokeWidth: 0 }}
+                  >
+                    <LabelList dataKey="value" position="top" fill="#fff" fontSize={11} fontWeight="bold" offset={10} />
+                  </Area>
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </SidebarPanel>
+
           {/* 水位数据 Panel */}
           <SidebarPanel title="水位数据" unit="mm">
             <div className="h-[300px] w-full mt-[-10px]"> 
@@ -298,70 +422,42 @@ const App: React.FC = () => {
               </ResponsiveContainer>
             </div>
           </SidebarPanel>
-
-          {/* 流量数据 Panel */}
-          <SidebarPanel title="流量数据" unit="m³/h">
-            <div className="h-[240px] w-full mt-2">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={initialFlowData} margin={{ top: 30, right: 30, left: -10, bottom: 60 }}>
-                  <defs>
-                    <linearGradient id="colorFlow" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#00f2ff" stopOpacity={0.6}/>
-                      <stop offset="95%" stopColor="#00f2ff" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.1)" />
-                  <XAxis 
-                    dataKey="name" 
-                    interval={0} 
-                    tick={<CustomXAxisLabel />}
-                    axisLine={{ stroke: 'rgba(255,255,255,0.2)' }}
-                    tickLine={false}
-                  />
-                  <YAxis 
-                    stroke="rgba(255,255,255,0.4)" 
-                    fontSize={11} 
-                    ticks={[0, 200, 400, 600, 800, 1000, 1200]}
-                    axisLine={{ stroke: 'rgba(255,255,255,0.2)' }}
-                    tickLine={false}
-                  />
-                  <Tooltip contentStyle={{ backgroundColor: 'rgba(10, 25, 47, 0.95)', border: '1px solid #00f2ff' }} />
-                  <Area 
-                    type="monotone" 
-                    dataKey="value" 
-                    stroke="#00f2ff" 
-                    strokeWidth={3} 
-                    fillOpacity={1} 
-                    fill="url(#colorFlow)" 
-                    dot={{ r: 5, fill: '#00f2ff', stroke: '#fff', strokeWidth: 2 }}
-                    activeDot={{ r: 7, strokeWidth: 0 }}
-                  >
-                    <LabelList dataKey="value" position="top" fill="#fff" fontSize={11} fontWeight="bold" offset={10} />
-                  </Area>
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </SidebarPanel>
-
-          {/* 水压数据 Panel - AUTO SCROLLING */}
-          <SidebarPanel title="水压数据" unit="Mpa">
-            <AutoScrollingTable data={pressureData} />
-          </SidebarPanel>
         </div>
 
         {/* Center Visualization */}
         <div className="flex-1 relative flex flex-col">
-          <StatsOverview />
-          <MineSchematic />
+          <StatsOverview 
+            totalHoles={holeStats.total}
+            alertsCount={holeStats.warning}
+            onlineHoles={holeStats.online}
+            offlineHoles={holeStats.offline}
+            warningHoles={holeStats.warning}
+          />
+          <MineSchematic 
+            showLabels={showLabels} 
+            onSelectSensor={(sensor) => setSelectedSensor(sensor)}
+          />
           
           <div className="absolute bottom-6 right-6 flex flex-col gap-3 z-20">
-            <button className="w-11 h-11 flex items-center justify-center bg-slate-900/90 border border-cyan-500/50 rounded shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:bg-cyan-500/30 text-cyan-400 transition-all">
+            <button
+              onClick={() => setShowLabels(v => !v)}
+              className="w-11 h-11 flex items-center justify-center bg-slate-900/90 border border-cyan-500/50 rounded shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:bg-cyan-500/30 text-cyan-400 transition-all"
+              title={showLabels ? '隐藏标签' : '显示标签'}
+            >
+              {showLabels ? <EyeOff size={22} /> : <Eye size={22} />}
+            </button>
+            <button
+              onClick={() => setActivePanel('layers')}
+              className="w-11 h-11 flex items-center justify-center bg-slate-900/90 border border-cyan-500/50 rounded shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:bg-cyan-500/30 text-cyan-400 transition-all"
+              title="图层控制"
+            >
                <Layers size={22} />
             </button>
-            <button className="w-11 h-11 flex items-center justify-center bg-slate-900/90 border border-cyan-500/50 rounded shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:bg-cyan-500/30 text-cyan-400 transition-all">
-               <Settings size={22} />
-            </button>
-            <button className="w-11 h-11 flex items-center justify-center bg-slate-900/90 border border-cyan-500/50 rounded shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:bg-cyan-500/30 text-cyan-400 transition-all">
+            <button
+              onClick={() => setActivePanel('tools')}
+              className="w-11 h-11 flex items-center justify-center bg-slate-900/90 border border-cyan-500/50 rounded shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:bg-cyan-500/30 text-cyan-400 transition-all"
+              title="工具箱"
+            >
                <Wrench size={22} />
             </button>
           </div>
@@ -376,7 +472,7 @@ const App: React.FC = () => {
 
           {/* 水质数据 Panel - ADJUSTED FOR BETTER VISIBILITY */}
           <SidebarPanel title="水质数据" unit="NTU">
-            <div className="grid grid-cols-3 gap-y-8 gap-x-2 mt-4 px-1 pb-10">
+            <div className="grid grid-cols-3 gap-y-4 gap-x-2 mt-2 px-1 pb-4">
               {waterQualityData.map((item, i) => (
                 <TechGauge key={i} value={item.val} label={item.label} />
               ))}
@@ -389,14 +485,14 @@ const App: React.FC = () => {
               <div className="flex flex-col items-center group">
                 <div className="relative w-28 h-28 flex items-center justify-center border-[8px] border-cyan-500/10 rounded-full transition-transform group-hover:scale-105">
                   <div className="absolute inset-0 border-t-[8px] border-cyan-500 rounded-full rotate-[120deg] shadow-[0_0_15px_rgba(6,182,212,0.4)]"></div>
-                  <span className="text-cyan-400 font-black text-2xl italic">26.6</span>
+                  <span className="text-cyan-400 font-black text-2xl italic">{tempA.toFixed(1)}</span>
                 </div>
                 <span className="text-[12px] text-slate-400 mt-4 font-semibold tracking-wide">21404采空区温度</span>
               </div>
               <div className="flex flex-col items-center group">
                 <div className="relative w-28 h-28 flex items-center justify-center border-[8px] border-blue-500/10 rounded-full transition-transform group-hover:scale-105">
                   <div className="absolute inset-0 border-t-[8px] border-blue-500 rounded-full -rotate-[45deg] shadow-[0_0_15px_rgba(59,130,246,0.4)]"></div>
-                  <span className="text-blue-400 font-black text-2xl italic">22.8</span>
+                  <span className="text-blue-400 font-black text-2xl italic">{tempB.toFixed(1)}</span>
                 </div>
                 <span className="text-[12px] text-slate-400 mt-4 font-semibold tracking-wide">中央井底水文孔</span>
               </div>
@@ -406,6 +502,38 @@ const App: React.FC = () => {
       </main>
 
       <div className="bg-cyan-500/10 h-[1px] w-full"></div>
+
+      {/* Sensor Detail Modal */}
+      <SensorDetailModal 
+        sensor={selectedSensor} 
+        onClose={() => setSelectedSensor(null)} 
+      />
+
+      {/* Control Panels */}
+      <LayersModal 
+        isOpen={activePanel === 'layers'} 
+        onClose={() => setActivePanel(null)} 
+      />
+      <SettingsModal 
+        isOpen={activePanel === 'settings'} 
+        onClose={() => setActivePanel(null)} 
+      />
+      <ToolsModal 
+        isOpen={activePanel === 'tools'} 
+        onClose={() => setActivePanel(null)} 
+      />
+      <AlarmHistoryModal 
+        isOpen={activePanel === 'alarm'} 
+        onClose={() => setActivePanel(null)} 
+      />
+      <UserProfileModal 
+        isOpen={activePanel === 'user'} 
+        onClose={() => setActivePanel(null)} 
+      />
+      <HomeSummaryModal 
+        isOpen={activePanel === 'home'} 
+        onClose={() => setActivePanel(null)} 
+      />
     </div>
   );
 };

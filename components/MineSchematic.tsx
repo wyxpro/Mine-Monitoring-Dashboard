@@ -1,7 +1,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 
 interface SensorData {
   id: string;
@@ -12,25 +13,39 @@ interface SensorData {
   color: string;
 }
 
-const sensors: SensorData[] = [
-  { id: 's1', name: "2111水文监测孔 (水压)", value: "-35", type: 'pressure', pos: [-6, 2, 2], color: "#eab308" },
-  { id: 's2', name: "403主运反倔管道流量计A管", value: "-37", type: 'flow', pos: [-4, 2, -1], color: "#22d3ee" },
-  { id: 's3', name: "水仓管道流量A管", value: "-2", type: 'flow', pos: [0, 4, -2], color: "#22d3ee" },
-  { id: 's4', name: "2-2水仓矿化度", value: "-40", type: 'temp', pos: [3, 3, -1], color: "#eab308" },
-  { id: 's5', name: "四盘区泄水巷水文监测孔 (水压)", value: "-21", type: 'pressure', pos: [4, 1, 3], color: "#ffffff" },
-  { id: 's6', name: "中央风井底水文监测孔1# (水压)", value: "-13", type: 'pressure', pos: [0, -1, 8], color: "#ffffff" },
-  { id: 's7', name: "西翼斜巷管道流量B管", value: "-10", type: 'flow', pos: [-2, -1, 5], color: "#ffffff" },
-  { id: 's8', name: "21404采空区温度", value: "-23", type: 'temp', pos: [6, 6, -3], color: "#eab308" },
-];
+interface MineSchematicProps {
+  showLabels?: boolean;
+  onSelectSensor?: (sensor: SensorData) => void;
+}
 
-const MineSchematic: React.FC = () => {
+const sensors: SensorData[] = [
+  { id: 's1', name: "探放水孔装置1", value: "-35", type: 'pressure', pos: [-6, 2, 2], color: "#eab308" },
+  { id: 's2', name: "探放水孔装置2", value: "-37", type: 'flow', pos: [-4, 2, -1], color: "#22d3ee" },
+  { id: 's3', name: "探放水孔装置3", value: "-2", type: 'flow', pos: [0, 4, -2], color: "#22d3ee" },
+  { id: 's4', name: "探放水孔装置4", value: "-40", type: 'temp', pos: [3, 3, -1], color: "#eab308" },
+  { id: 's5', name: "探放水孔装置5", value: "-21", type: 'pressure', pos: [4, 1, 3], color: "#ffffff" },
+  { id: 's6', name: "探放水孔装置6", value: "-13", type: 'pressure', pos: [0, -1, 8], color: "#ffffff" },
+  { id: 's7', name: "探放水孔装置7", value: "-10", type: 'flow', pos: [-2, -1, 5], color: "#ffffff" },
+  { id: 's8', name: "探放水孔装置8", value: "-23", type: 'temp', pos: [6, 6, -3], color: "#eab308" },
+];  
+
+const MineSchematic: React.FC<MineSchematicProps> = ({ showLabels = true, onSelectSensor }) => {
   const mountRef = useRef<HTMLDivElement>(null);
-  const [projectedLabels, setProjectedLabels] = useState<any[]>([]);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const showLabelsRef = useRef<boolean>(showLabels);
+
+  useEffect(() => {
+    showLabelsRef.current = showLabels;
+  }, [showLabels]);
 
   useEffect(() => {
     if (!mountRef.current) return;
+
+    // Hard cleanup to remove any stale overlay children from previous hot reloads
+    while (mountRef.current.firstChild) {
+      mountRef.current.removeChild(mountRef.current.firstChild);
+    }
 
     const width = mountRef.current.clientWidth;
     const height = mountRef.current.clientHeight;
@@ -48,6 +63,12 @@ const MineSchematic: React.FC = () => {
     renderer.setSize(width, height);
     renderer.setPixelRatio(window.devicePixelRatio);
     mountRef.current.appendChild(renderer.domElement);
+    const labelRenderer = new CSS2DRenderer();
+    labelRenderer.setSize(width, height);
+    labelRenderer.domElement.style.position = 'absolute';
+    labelRenderer.domElement.style.top = '0';
+    labelRenderer.domElement.style.pointerEvents = 'none';
+    mountRef.current.appendChild(labelRenderer.domElement);
 
     // Controls
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -107,6 +128,8 @@ const MineSchematic: React.FC = () => {
     const mouse = new THREE.Vector2();
     const interactiveObjects: THREE.Object3D[] = [];
 
+    const sensorObjectMap: Record<string, THREE.Object3D> = {};
+    const labelObjects: Record<string, CSS2DObject> = {};
     sensors.forEach((s) => {
       const group = new THREE.Group();
       group.position.set(...s.pos);
@@ -118,6 +141,7 @@ const MineSchematic: React.FC = () => {
       mesh.userData = { id: s.id };
       group.add(mesh);
       interactiveObjects.push(mesh);
+      sensorObjectMap[s.id] = mesh;
 
       // Pulsing ring
       const ringGeo = new THREE.RingGeometry(0.3, 0.4, 32);
@@ -127,6 +151,34 @@ const MineSchematic: React.FC = () => {
       group.add(ring);
 
       scene.add(group);
+    });
+
+    // Create CSS2D labels anchored to sensors (auto-follow camera)
+    sensors.forEach((s) => {
+      const div = document.createElement('div');
+      div.className = 'pointer-events-none';
+      div.innerHTML = `
+        <div class="absolute w-[1px] h-4 bg-white/30 bottom-0 left-1/2 -translate-x-1/2"></div>
+        <div class="label-item pointer-events-auto cursor-pointer absolute bottom-[1rem] left-1/2 -translate-x-1/2 min-w-[160px] p-2 bg-black/60 border border-white/20 backdrop-blur-md rounded-sm">
+          <div class="text-[10px] text-white/80 font-medium whitespace-nowrap mb-0.5">${s.name}</div>
+          <div class="flex items-center justify-between">
+            <div class="text-xs font-bold text-white tracking-tight">数据: <span class="font-mono text-cyan-400">${s.value}</span></div>
+            <div class="w-1.5 h-1.5 rounded-full" style="background-color:${s.color}"></div>
+          </div>
+          <div class="absolute -top-[1px] -left-[1px] w-1.5 h-1.5 border-t border-l border-white/40"></div>
+          <div class="absolute -bottom-[1px] -right-[1px] w-1.5 h-1.5 border-b border-r border-white/40"></div>
+        </div>
+      `;
+      const labelObj = new CSS2DObject(div);
+      labelObj.position.set(0, 0.9, 0);
+      const anchor = sensorObjectMap[s.id];
+      anchor.add(labelObj);
+      labelObjects[s.id] = labelObj;
+      (div.querySelector('.label-item') as HTMLElement).onclick = () => { 
+        setSelectedId(s.id);
+        onSelectSensor?.(s);
+      };
+      labelObj.visible = showLabelsRef.current;
     });
 
     // Interaction handlers
@@ -141,7 +193,10 @@ const MineSchematic: React.FC = () => {
       raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObjects(interactiveObjects);
       if (intersects.length > 0) {
-        setSelectedId(intersects[0].object.userData.id);
+        const id = intersects[0].object.userData.id;
+        setSelectedId(id);
+        const sensor = sensors.find(s => s.id === id);
+        if (sensor) onSelectSensor?.(sensor);
       } else {
         setSelectedId(null);
       }
@@ -176,23 +231,16 @@ const MineSchematic: React.FC = () => {
         document.body.style.cursor = 'default';
       }
 
-      // Project labels to 2D
-      const labels = sensors.map((s) => {
-        const v = new THREE.Vector3(...s.pos);
-        v.project(camera);
-        return {
-          id: s.id,
-          name: s.name,
-          value: s.value,
-          x: (v.x * 0.5 + 0.5) * width,
-          y: (-(v.y * 0.5) + 0.5) * height,
-          visible: v.z < 1,
-          color: s.color
-        };
+      // Toggle label visibility only (position handled by CSS2D)
+      sensors.forEach((s) => {
+        const obj = labelObjects[s.id];
+        if (obj) {
+          obj.visible = showLabelsRef.current;
+        }
       });
-      setProjectedLabels(labels);
 
       renderer.render(scene, camera);
+      labelRenderer.render(scene, camera);
       requestAnimationFrame(animate);
     };
     animate();
@@ -204,6 +252,7 @@ const MineSchematic: React.FC = () => {
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
+      labelRenderer.setSize(w, h);
     };
     window.addEventListener('resize', handleResize);
 
@@ -212,6 +261,7 @@ const MineSchematic: React.FC = () => {
       window.removeEventListener('click', onClick);
       window.removeEventListener('resize', handleResize);
       mountRef.current?.removeChild(renderer.domElement);
+      mountRef.current?.removeChild(labelRenderer.domElement);
     };
   }, []);
 
@@ -219,48 +269,7 @@ const MineSchematic: React.FC = () => {
     <div className="flex-1 relative overflow-hidden bg-[#030816]">
       <div ref={mountRef} className="w-full h-full cursor-crosshair" />
 
-      {/* Floating Labels Overlay */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {projectedLabels.map((l) => (
-          l.visible && (
-            <div
-              key={l.id}
-              className={`absolute transition-all duration-300 ${
-                hoveredId === l.id || selectedId === l.id ? 'z-50 scale-105' : 'z-10'
-              }`}
-              style={{
-                left: l.x,
-                top: l.y,
-              }}
-            >
-              {/* Leader Line */}
-              <div className="absolute bottom-0 left-0 w-[1px] h-12 bg-white/20 origin-bottom rotate-[-30deg]"></div>
-              
-              {/* Label Content */}
-              <div
-                className={`label-item pointer-events-auto cursor-pointer absolute bottom-12 left-4 min-w-[160px] p-2 bg-black/60 border border-white/20 backdrop-blur-md rounded-sm transition-colors ${
-                  hoveredId === l.id || selectedId === l.id ? 'bg-cyan-500/20 border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)]' : ''
-                }`}
-                onClick={() => setSelectedId(l.id)}
-              >
-                <div className="text-[10px] text-white/80 font-medium whitespace-nowrap mb-0.5">
-                  {l.name}
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="text-xs font-bold text-white tracking-tight">
-                    数据: <span className="font-mono text-cyan-400">{l.value}</span>
-                  </div>
-                  <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: l.color }}></div>
-                </div>
-
-                {/* Corner Decoration */}
-                <div className="absolute -top-[1px] -left-[1px] w-1.5 h-1.5 border-t border-l border-white/40"></div>
-                <div className="absolute -bottom-[1px] -right-[1px] w-1.5 h-1.5 border-b border-r border-white/40"></div>
-              </div>
-            </div>
-          )
-        ))}
-      </div>
+      {/* Floating Labels are rendered by CSS2DRenderer and appended to mountRef */}
 
       {/* HUD Elements */}
       <div className="absolute top-4 right-4 flex flex-col items-end gap-2 pointer-events-none opacity-60">
@@ -273,15 +282,15 @@ const MineSchematic: React.FC = () => {
       <div className="absolute bottom-6 left-6 p-4 border border-white/5 bg-black/40 backdrop-blur-md rounded flex gap-6 z-20 pointer-events-auto">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-          <span className="text-[11px] text-slate-300">水压/水文</span>
+          <span className="text-[11px] text-slate-300">预警装置</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-cyan-400"></div>
-          <span className="text-[11px] text-slate-300">流量/管道</span>
+          <span className="text-[11px] text-slate-300">在线装置</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-white"></div>
-          <span className="text-[11px] text-slate-300">综合测孔</span>
+          <span className="text-[11px] text-slate-300">离线装置</span>
         </div>
       </div>
     </div>
