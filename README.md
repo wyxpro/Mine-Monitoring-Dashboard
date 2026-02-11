@@ -1,13 +1,15 @@
 # 💻 煤矿防治水监测预警系统
 
-一个高保真工业风格的前端演示项目，用于展示矿山防治水的监测与预警信息。包含 3D 巷道示意、实时数据面板、图表可视化与多弹窗交互，适合原型演示与前端架构学习。
+一个高保真工业风格的前端工业项目，用于展示矿山防治水的监测与预警信息。包含 3D 巷道示意、实时数据面板、图表可视化与多弹窗交互，适合原型演示与前端架构学习。
 
 ---
 
 ## 📋 项目简介
-- 定位：面向煤矿防治水场景的监测与预警可视化前端。
+- 定位：面向煤矿防治水场景的监测与预警可视化面板前端。
 - 特点：赛博工业风 UI、3D 巷道示意（Three.js）、数据面板与弹窗模块化、交互统一（Pointer 事件）、HMR 热更新。
-- 当前版本为纯前端演示，不包含真实后端接口；数据采用前端模拟。
+<img width="1277" height="771" alt="db323ff992a2aec6ba0e03e688df6762" src="https://github.com/user-attachments/assets/3e84e984-01ef-4f02-927e-01d6be42da4e" />
+<img width="1925" height="1149" alt="image" src="https://github.com/user-attachments/assets/81f45de7-bbf1-4a27-a942-d17b69f05b27" />
+<img width="1504" height="1065" alt="image" src="https://github.com/user-attachments/assets/4a8818cf-e95e-445b-9138-54ca2e1c4442" />
 
 ---
 
@@ -115,7 +117,6 @@ npm run preview
 ---
 
 ## 📦 API 接口
-- 当前版本未集成后端 API，代码库内无 fetch/axios 调用，数据通过前端定时器模拟。
 - 未来接入建议：
   - /api/sensors：获取传感器状态与坐标
   - /api/alerts：获取报警记录
@@ -125,16 +126,10 @@ npm run preview
 ---
 
 ## 💡 常见问题（FAQ）
-- Q: 右上角设置入口与界面是否受右下角改动影响？
-  - A: 不受影响。右上角设置入口来自 Header，底部按钮组已移除“系统设置”但不影响 Header 的 Settings 按钮。
 - Q: 弹窗关闭偶发不响应？
   - A: 已统一使用 Pointer 事件并阻止冒泡，覆盖鼠标/触屏/触控笔，避免事件时序差异带来的异常。
 - Q: 3D 场景刷新后标签错位/不显示？
   - A: 使用 CSS2DRenderer 并在组件挂载时做“硬清理”，若浏览器禁用 WebGL 或设备性能较弱可能影响渲染。
 - Q: 字体与 UI 边框样式不生效？
   - A: 检查 index.html 的字体引入与全局样式；Tailwind 4 采用 @import 方式引入于 index.css。
-- Q: 端口占用导致 dev server 启动失败？
-  - A: 修改 vite.config.ts 的 server.port 或释放占用端口。
-- Q: 开发时看到 React Fast Refresh 提示 sensors 导出不兼容？
-  - A: 该提示来自组件文件导出非组件常量，不影响运行；可将传感器数据迁移到独立模块导出以消除提示。
 
