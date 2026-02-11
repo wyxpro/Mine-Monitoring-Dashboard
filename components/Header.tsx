@@ -58,27 +58,6 @@ const Header: React.FC<HeaderProps> = ({
 
       {/* Center Group: Buttons and Title */}
       <div className="flex-1 flex items-center justify-center relative h-full">
-        {/* Left Trapezoid Button */}
-        <div className="relative mr-4 group cursor-pointer">
-          <div 
-            className="w-40 h-10 bg-[#162a4d]/60 border-y border-cyan-500/40 flex items-center justify-center transition-all hover:bg-cyan-500/20"
-            style={{ 
-              clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)',
-              backgroundImage: 'radial-gradient(circle at center, rgba(6,182,212,0.1) 0%, transparent 70%)'
-            }}
-          >
-            {/* Grid Pattern Overlay */}
-            <div className="absolute inset-0 opacity-20 pointer-events-none" 
-                 style={{ backgroundImage: 'linear-gradient(90deg, #00f2ff 1px, transparent 1px), linear-gradient(#00f2ff 1px, transparent 1px)', backgroundSize: '10px 10px' }}></div>
-            <span className="text-white font-bold tracking-widest text-sm relative z-10">自研大数据</span>
-          </div>
-          {/* Accent Lines */}
-          <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-             <div className="absolute top-0 left-[15%] right-0 h-[1px] bg-cyan-400/60 shadow-[0_0_8px_rgba(34,211,238,0.5)]"></div>
-             <div className="absolute bottom-0 left-0 right-[15%] h-[1px] bg-cyan-400/60 shadow-[0_0_8px_rgba(34,211,238,0.5)]"></div>
-          </div>
-        </div>
-
         {/* Central Title Housing */}
         <div className="relative flex items-center justify-center h-full px-16">
           {/* Main Decorative Plateau */}
@@ -94,26 +73,6 @@ const Header: React.FC<HeaderProps> = ({
           <h1 className="text-4xl font-bold tracking-[0.25em] text-white z-10 drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
             煤矿防治水监测预警系统
           </h1>
-        </div>
-
-        {/* Right Trapezoid Button */}
-        <div className="relative ml-4 group cursor-pointer">
-          <div 
-            className="w-40 h-10 bg-[#162a4d]/60 border-y border-cyan-500/40 flex items-center justify-center transition-all hover:bg-cyan-500/20 shadow-[inset_0_0_10px_rgba(6,182,212,0.1)]"
-            style={{ 
-              clipPath: 'polygon(0 0, 85% 0, 100% 100%, 15% 100%)',
-              backgroundImage: 'radial-gradient(circle at center, rgba(6,182,212,0.1) 0%, transparent 70%)'
-            }}
-          >
-            <div className="absolute inset-0 opacity-20 pointer-events-none" 
-                 style={{ backgroundImage: 'linear-gradient(90deg, #00f2ff 1px, transparent 1px), linear-gradient(#00f2ff 1px, transparent 1px)', backgroundSize: '10px 10px' }}></div>
-            <span className="text-white font-bold tracking-widest text-sm relative z-10">算法赋能</span>
-          </div>
-          {/* Accent Lines */}
-          <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-             <div className="absolute top-0 left-0 right-[15%] h-[1px] bg-cyan-400/60 shadow-[0_0_8px_rgba(34,211,238,0.5)]"></div>
-             <div className="absolute bottom-0 left-[15%] right-0 h-[1px] bg-cyan-400/60 shadow-[0_0_8px_rgba(34,211,238,0.5)]"></div>
-          </div>
         </div>
       </div>
 

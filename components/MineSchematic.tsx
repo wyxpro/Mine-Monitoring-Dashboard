@@ -18,7 +18,7 @@ interface MineSchematicProps {
   onSelectSensor?: (sensor: SensorData) => void;
 }
 
-const sensors: SensorData[] = [
+export const sensors: SensorData[] = [
   { id: 's1', name: "探放水孔装置1", value: "-35", type: 'pressure', pos: [-6, 2, 2], color: "#eab308" },
   { id: 's2', name: "探放水孔装置2", value: "-37", type: 'flow', pos: [-4, 2, -1], color: "#22d3ee" },
   { id: 's3', name: "探放水孔装置3", value: "-2", type: 'flow', pos: [0, 4, -2], color: "#22d3ee" },
@@ -27,6 +27,8 @@ const sensors: SensorData[] = [
   { id: 's6', name: "探放水孔装置6", value: "-13", type: 'pressure', pos: [0, -1, 8], color: "#ffffff" },
   { id: 's7', name: "探放水孔装置7", value: "-10", type: 'flow', pos: [-2, -1, 5], color: "#ffffff" },
   { id: 's8', name: "探放水孔装置8", value: "-23", type: 'temp', pos: [6, 6, -3], color: "#eab308" },
+  { id: 's9', name: "探放水孔装置9", value: "-18", type: 'flow', pos: [8, 2, 2], color: "#22d3ee" },
+  { id: 's10', name: "探放水孔装置10", value: "-27", type: 'flow', pos: [-8, 2, -2], color: "#22d3ee" },
 ];  
 
 const MineSchematic: React.FC<MineSchematicProps> = ({ showLabels = true, onSelectSensor }) => {
@@ -134,21 +136,29 @@ const MineSchematic: React.FC<MineSchematicProps> = ({ showLabels = true, onSele
       const group = new THREE.Group();
       group.position.set(...s.pos);
       
-      // Node marker
+      // Invisible hit target for raycasting (keeps interaction)
       const geo = new THREE.SphereGeometry(0.2, 16, 16);
-      const mat = new THREE.MeshBasicMaterial({ color: s.color });
+      const mat = new THREE.MeshBasicMaterial({ color: s.color, transparent: true, opacity: 0 });
       const mesh = new THREE.Mesh(geo, mat);
       mesh.userData = { id: s.id };
       group.add(mesh);
       interactiveObjects.push(mesh);
       sensorObjectMap[s.id] = mesh;
 
-      // Pulsing ring
-      const ringGeo = new THREE.RingGeometry(0.3, 0.4, 32);
-      const ringMat = new THREE.MeshBasicMaterial({ color: s.color, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
-      const ring = new THREE.Mesh(ringGeo, ringMat);
-      ring.name = "pulse";
-      group.add(ring);
+      // CSS2D pin icon (vector) with original color
+      const pinDiv = document.createElement('div');
+      pinDiv.className = 'pointer-events-none';
+      pinDiv.innerHTML = `
+        <svg width="24" height="32" viewBox="0 0 24 32" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 4px ${s.color});">
+          <path d="M12 2C7.03 2 3 6.03 3 11c0 6.9 7.2 18 9 18s9-11.1 9-18c0-4.97-4.03-9-9-9z" fill="${s.color}" opacity="0.85"/>
+          <circle cx="12" cy="11" r="4" fill="${s.color === '#ffffff' ? '#111827' : '#ffffff'}"/>
+        </svg>
+      `;
+      const pinObj = new CSS2DObject(pinDiv);
+      pinObj.position.set(0, 0, 0);
+      group.add(pinObj);
+
+      // No outer ring; only pin icon is shown per requirement
 
       scene.add(group);
     });
@@ -211,14 +221,7 @@ const MineSchematic: React.FC<MineSchematicProps> = ({ showLabels = true, onSele
       frame += 0.05;
       controls.update();
 
-      // Pulse animation
-      scene.traverse((obj) => {
-        if (obj.name === "pulse") {
-          obj.scale.setScalar(1 + Math.sin(frame) * 0.2);
-          (obj as any).material.opacity = 0.4 + Math.sin(frame) * 0.2;
-          obj.lookAt(camera.position);
-        }
-      });
+      // No ring pulse animation
 
       // Hover check
       raycaster.setFromCamera(mouse, camera);

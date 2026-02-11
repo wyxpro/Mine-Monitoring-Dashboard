@@ -17,10 +17,10 @@ const StatsOverview: React.FC<StatsOverviewProps> = ({
   warningHoles,
 }) => {
   return (
-    <div className="flex gap-4 p-4 z-20 pointer-events-none">
-      <div className="bg-slate-900/60 border-l-4 border-cyan-500 px-4 py-2 backdrop-blur-md">
+    <div className="flex gap-6 p-4 z-20 pointer-events-none">
+      <div className="bg-slate-900/60 border-l-4 border-green-500 px-4 py-2 backdrop-blur-md">
         <p className="text-[10px] text-slate-400 uppercase tracking-widest">探放水孔数</p>
-        <p className="text-2xl font-bold text-cyan-400">{totalHoles} <span className="text-xs font-normal">个</span></p>
+        <p className="text-2xl font-bold text-green-400">{totalHoles} <span className="text-xs font-normal">个</span></p>
       </div>
       <div className="bg-slate-900/60 border-l-4 border-red-500 px-4 py-2 backdrop-blur-md">
         <p className="text-[10px] text-slate-400 uppercase tracking-widest">预警数量</p>

@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef } from 'react';
-import { X, Layers, Box, Map, Grid, Crosshair } from 'lucide-react';
+import { X, Layers, Box, Map, Grid, Crosshair, Upload } from 'lucide-react';
 
 interface LayersModalProps {
   isOpen: boolean;
@@ -10,6 +10,7 @@ interface LayersModalProps {
 const LayersModal: React.FC<LayersModalProps> = ({ isOpen, onClose }) => {
   const overlayRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -53,6 +54,24 @@ const LayersModal: React.FC<LayersModalProps> = ({ isOpen, onClose }) => {
         </div>
 
         <div className="p-6 space-y-4">
+          <div>
+            <input 
+              ref={fileRef} 
+              type="file" 
+              accept=".json,.geojson,.kml,.kmz,.shp" 
+              className="hidden" 
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) console.log('地图导入:', f.name);
+              }}
+            />
+            <button 
+              onClick={() => fileRef.current?.click()} 
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs bg-blue-600 text-white rounded hover:bg-blue-500 transition-all border border-blue-500/40"
+            >
+              <Upload size={14} /> 地图导入
+            </button>
+          </div>
           <LayerToggleItem icon={<Box size={18} />} label="巷道三维模型" defaultChecked={true} />
           <LayerToggleItem icon={<Map size={18} />} label="传感器标注图层" defaultChecked={true} />
           <LayerToggleItem icon={<Grid size={18} />} label="辅助网格底面" defaultChecked={true} />

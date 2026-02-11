@@ -10,6 +10,7 @@ import {
   Tooltip, 
   ResponsiveContainer 
 } from 'recharts';
+import suikImg from '../suik.png';
 
 interface SensorDetailModalProps {
   sensor: {
@@ -28,6 +29,7 @@ const SensorDetailModal: React.FC<SensorDetailModalProps> = ({ sensor, onClose }
   const [alarmData, setAlarmData] = useState<Array<{ time: string; level: 'info' | 'warning' | 'critical'; message: string; value: number }>>([]);
   const overlayRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const [selectedHole, setSelectedHole] = useState<'A孔' | 'B孔' | 'C孔' | 'D孔'>('A孔');
 
   // Generate random mock data for the chart
   useEffect(() => {
@@ -48,7 +50,7 @@ const SensorDetailModal: React.FC<SensorDetailModalProps> = ({ sensor, onClose }
         : sensor.type === 'pressure'
           ? { info: '压力波动', warning: '水压接近预警阈值', critical: '水压异常升高' } // 删除“水压稳定”
           : { info: '温度波动', warning: '温度接近上限', critical: '温度异常升高' };
-      const hasWarning = Math.random() < 0.5;
+      const hasWarning = sensor.color === '#eab308';
       const pickLevel = (): 'info' | 'warning' | 'critical' => {
         if (!hasWarning) return 'info';
         const r = Math.random();
@@ -93,7 +95,7 @@ const SensorDetailModal: React.FC<SensorDetailModalProps> = ({ sensor, onClose }
     h2s: Number((Math.random() * 0.5).toFixed(3)),
   };
 
-  const status = alarmData.some(a => a.level !== 'info') ? '有预警' : '无预警';
+  const status = sensor.color === '#eab308' ? '有预警' : '无预警';
   const statusColor = status === '有预警' ? 'text-red-500' : 'text-green-400';
   return (
     <div
@@ -133,6 +135,16 @@ const SensorDetailModal: React.FC<SensorDetailModalProps> = ({ sensor, onClose }
           <div className="flex items-center gap-3">
             <div className="w-2 h-6 bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]"></div>
             <h2 className="text-xl font-bold tracking-[0.2em] text-white">{sensor.name}</h2>
+            <select
+              value={selectedHole}
+              onChange={(e) => setSelectedHole(e.target.value as 'A孔' | 'B孔' | 'C孔' | 'D孔')}
+              className="ml-3 px-3 py-1 bg-[#051124] border border-cyan-500/40 text-slate-200 rounded outline-none min-w-[110px] text-sm"
+            >
+              <option value="A孔">A孔</option>
+              <option value="B孔">B孔</option>
+              <option value="C孔">C孔</option>
+              <option value="D孔">D孔</option>
+            </select>
           </div>
         </div>
 
@@ -142,10 +154,8 @@ const SensorDetailModal: React.FC<SensorDetailModalProps> = ({ sensor, onClose }
             {/* Avatar block */}
             <div className="w-44 h-52 bg-[#051124] border border-cyan-500/30 flex items-center justify-center relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent opacity-50"></div>
-              <div className="w-28 h-28 bg-blue-600/20 rounded-xl flex items-center justify-center relative">
-                <User size={80} className="text-blue-500/60" />
-                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-cyan-500/20 border border-cyan-500/40 rounded-full animate-pulse"></div>
-              </div>
+              <img src={suikImg} alt="孔位图片" className="w-full h-full object-contain rounded-md relative z-10" />
+              <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-cyan-500/20 border border-cyan-500/40 rounded-full animate-pulse"></div>
             </div>
 
             {/* Details list */}

@@ -27,6 +27,7 @@ import {
 import Header from './components/Header';
 import SidebarPanel from './components/SidebarPanel';
 import MineSchematic from './components/MineSchematic';
+import { sensors } from './components/MineSchematic';
 import StatsOverview from './components/StatsOverview';
 import SensorDetailModal from './components/SensorDetailModal';
 import LayersModal from './components/LayersModal';
@@ -56,25 +57,25 @@ const initialPressureData = [
   { name: '探放水孔装置1', value: 0.262 },
   { name: '探放水孔装置2', value: 0.294 },
   { name: '探放水孔装置3', value: 1.781 },
-  { name: '探放水孔装置4', value: 0.000 },
+  { name: '探放水孔装置4', value: 0.027 },
   { name: '探放水孔装置5', value: 0.025 },
   { name: '探放水孔装置6', value: 0.142 },
   { name: '探放水孔装置7', value: 0.089 },
 ];
 
 const initialPipeFlowData = [
-  { name: '探放水孔装置1', value: 0.000 },
-  { name: '探放水孔装置2', value: 316.800 },
-  { name: '探放水孔装置3', value: 0.000 },
-  { name: '探放水孔装置4', value: 0.000 },
-  { name: '探放水孔装置5', value: 0.000 },
+  { name: '探放水孔装置1', value: 18.26 },
+  { name: '探放水孔装置2', value: 116.800 },
+  { name: '探放水孔装置3', value: 89.56 },
+  { name: '探放水孔装置4', value: 125.36 },
+  { name: '探放水孔装置5', value: 211.032 },
   { name: '探放水孔装置6', value: 124.500 },
   { name: '探放水孔装置7', value: 45.210 },
 ];
 
-const waterQualityData = [
-  { label: '探放水孔装置1', val: '1.781' },
-  { label: '探放水孔装置2 ', val: '0.000' },
+const initialWaterQualityData = [
+  { label: '探放水孔装置1 ', val: '0.781' },
+  { label: '探放水孔装置2 ', val: '0.028' },
   { label: '探放水孔装置3 ', val: '0.025' },
   { label: '探放水孔装置4 ', val: '0.036' },
   { label: '探放水孔装置5 ', val: '0.581' },
@@ -220,12 +221,18 @@ const App: React.FC = () => {
   const [activePanel, setActivePanel] = useState<'layers' | 'settings' | 'tools' | 'alarm' | 'user' | 'home' | null>(null);
   const [tempA, setTempA] = useState(26.6);
   const [tempB, setTempB] = useState(22.8);
+  const [waterQuality, setWaterQuality] = useState(initialWaterQualityData);
+  const [flowData, setFlowData] = useState(initialFlowData);
+  const [waterLevelData, setWaterLevelData] = useState(initialWaterLevelData);
   const [holeStats, setHoleStats] = useState({
-    total: 30,
-    online: 18,
-    offline: 8,
-    warning: 4,
+    total: 10,
+    online: 6,
+    offline: 3,
+    warning: 1,
   });
+  const yellowCount = React.useMemo(() => sensors.filter(s => s.color === '#eab308').length, []);
+  const blueCount = React.useMemo(() => sensors.filter(s => s.color === '#22d3ee').length, []);
+  const whiteCount = React.useMemo(() => sensors.filter(s => s.color === '#ffffff').length, []);
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -245,6 +252,22 @@ const App: React.FC = () => {
           ? Number((item.value + (Math.random() - 0.5) * 2).toFixed(3))
           : 0
       })));
+      
+      setFlowData(prev => prev.map(item => ({
+        ...item,
+        value: Number((Math.max(0, item.value + (Math.random() - 0.5) * 40)).toFixed(3))
+      })));
+      
+      setWaterLevelData(prev => prev.map(item => ({
+        ...item,
+        value: Number((Math.min(1, Math.max(0, item.value + (Math.random() - 0.5) * 0.05))).toFixed(3))
+      })));
+      
+      setWaterQuality(prev => prev.map(item => {
+        const base = parseFloat(item.val) || 0;
+        const next = Math.max(0, base + (Math.random() - 0.5) * 0.02);
+        return { ...item, val: next.toFixed(3) };
+      }));
       
       setTempA(prev => {
         const next = prev + (Math.random() - 0.5) * 0.3;
@@ -328,7 +351,7 @@ const App: React.FC = () => {
           <SidebarPanel title="流量数据" unit="m³/h">
             <div className="h-[240px] w-full mt-2">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={initialFlowData} margin={{ top: 30, right: 30, left: -10, bottom: 60 }}>
+                <AreaChart data={flowData} margin={{ top: 30, right: 30, left: -10, bottom: 60 }}>
                   <defs>
                     <linearGradient id="colorFlow" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#00f2ff" stopOpacity={0.6}/>
@@ -373,7 +396,7 @@ const App: React.FC = () => {
             <div className="h-[300px] w-full mt-[-10px]"> 
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart 
-                  data={initialWaterLevelData} 
+                  data={waterLevelData} 
                   margin={{ top: 25, right: 10, left: -20, bottom: 85 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
@@ -427,11 +450,11 @@ const App: React.FC = () => {
         {/* Center Visualization */}
         <div className="flex-1 relative flex flex-col">
           <StatsOverview 
-            totalHoles={holeStats.total}
-            alertsCount={holeStats.warning}
-            onlineHoles={holeStats.online}
-            offlineHoles={holeStats.offline}
-            warningHoles={holeStats.warning}
+            totalHoles={sensors.length}
+            alertsCount={yellowCount}
+            onlineHoles={blueCount}
+            offlineHoles={whiteCount}
+            warningHoles={yellowCount}
           />
           <MineSchematic 
             showLabels={showLabels} 
@@ -473,7 +496,7 @@ const App: React.FC = () => {
           {/* 水质数据 Panel - ADJUSTED FOR BETTER VISIBILITY */}
           <SidebarPanel title="水质数据" unit="NTU">
             <div className="grid grid-cols-3 gap-y-4 gap-x-2 mt-2 px-1 pb-4">
-              {waterQualityData.map((item, i) => (
+              {waterQuality.map((item, i) => (
                 <TechGauge key={i} value={item.val} label={item.label} />
               ))}
             </div>
