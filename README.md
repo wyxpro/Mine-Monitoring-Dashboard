@@ -1,6 +1,6 @@
 # 💻 煤矿防治水监测预警系统
 
-一个高保真工业风格的前端工业项目，用于展示矿山防治水的监测与预警信息。包含 3D 巷道示意、实时数据面板、图表可视化与多弹窗交互，适合原型演示与前端架构学习。
+一个高保真工业风格的前端工业项目，用于展示矿山防治水的监测与预警信息。包含 3D 巷道示意、实时数据面板、图表可视化与多弹窗交互，适合煤矿工业应用。
 
 ---
 
@@ -9,7 +9,6 @@
 - 特点：赛博工业风 UI、3D 巷道示意（Three.js）、数据面板与弹窗模块化、交互统一（Pointer 事件）、HMR 热更新。
 <img width="1277" height="771" alt="db323ff992a2aec6ba0e03e688df6762" src="https://github.com/user-attachments/assets/3e84e984-01ef-4f02-927e-01d6be42da4e" />
 <img width="1925" height="1149" alt="image" src="https://github.com/user-attachments/assets/81f45de7-bbf1-4a27-a942-d17b69f05b27" />
-<img width="1504" height="1065" alt="image" src="https://github.com/user-attachments/assets/4a8818cf-e95e-445b-9138-54ca2e1c4442" />
 
 ---
 
